@@ -16,20 +16,35 @@ Vagrant.configure("2") do |config|
       vb.cpus = 1
     end
 
+    jenkins.vm.provision "file",
+      source: "ssh/id_deploy",
+      destination: "/tmp/id_deploy"
+
     jenkins.vm.provision "shell", path: "scripts/setup-node.sh"
     jenkins.vm.provision "shell", path: "scripts/setup-jenkins.sh"
   end
 
-  config.vm.define "prod" do |prod|
+    config.vm.define "prod" do |prod|
     prod.vm.box = "ubuntu/jammy64"
     prod.vm.hostname = "prod"
 
     prod.vm.network "private_network", ip: "192.168.56.20"
 
+    prod.vm.network "forwarded_port",
+      guest: 3000,
+      host: 3000,
+      auto_correct: true
+
+    prod.vm.synced_folder "../app", "/home/vagrant/app"
+
     prod.vm.provider "virtualbox" do |vb|
       vb.memory = 1024
       vb.cpus = 1
     end
+
+    prod.vm.provision "file",
+      source: "ssh/id_deploy.pub",
+      destination: "/tmp/id_deploy.pub"
 
     prod.vm.provision "shell", path: "scripts/setup-node.sh"
     prod.vm.provision "shell", path: "scripts/setup-prod.sh"
