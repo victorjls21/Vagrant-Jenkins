@@ -1,1 +1,5 @@
 .vagrant/
+**/.vagrant/
+node_modules/
+vagrant/ssh/id_deploy
+vagrant/ssh/id_deploy.pub.old
